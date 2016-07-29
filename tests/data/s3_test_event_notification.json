@@ -1,0 +1,3 @@
+[
+    {"Service":"Amazon S5","Event":"s3:TestEvent","Time":"2016-06-09T18:43:01.130Z","Bucket":"godzilla","RequestId":"A311687676D7EF82","HostId":"egIGJdAQHPZ/ZsSjJoq6Dj0HYouGsorKLMZF3luXAD71o24DuwHrgSebkF8GpPIQ"}
+]

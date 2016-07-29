@@ -1,0 +1,7 @@
+-r requirements.txt
+coverage==4.0
+flake8==2.3.0
+mock==1.0.1
+pre-commit==0.8.2
+pytest==2.7.3
+setuptools==7.0
