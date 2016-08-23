@@ -1,3 +1,7 @@
+![amira](amira_github_banner.png)
+
+[![PyPI](https://img.shields.io/pypi/v/amira.svg)](https://pypi.python.org/pypi/amira)
+
 # AMIRA: Automated Malware Incident Response & Analysis
 
 AMIRA is a service for automatically running the analysis on the
