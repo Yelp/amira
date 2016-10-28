@@ -15,4 +15,10 @@ setup(
     author_email="opensource@yelp.com",
     setup_requires="setuptools",
     packages=find_packages(exclude=["tests"]),
+    provides=["amira"],
+    install_requires=[
+        "boto",
+        "osxcollector_output_filters",
+        "simplejson",
+    ],
 )
