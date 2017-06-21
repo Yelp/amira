@@ -88,7 +88,8 @@ class AMIRA():
             # SQS queue to prevent the same exception from happening in the
             # future.
             logging.exception(
-                'Unexpected error while running the Analyze Filter')
+                'Unexpected error while running the Analyze Filter for the '
+                'object: {0}'.format(created_object.key_name))
 
     def _extract_osxcollector_output_json_file(self):
         """Extracts JSON file containing the OSXCollector output from
