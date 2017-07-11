@@ -10,9 +10,11 @@ from amira import __version__
 setup(
     name="amira",
     version=__version__,
-    description="Automated Malware Incident Response and Analysis.",
+    description="Automated Malware Incident Response and Analysis",
     author="Yelp Security",
     author_email="opensource@yelp.com",
+    license="The MIT License (MIT)",
+    url="https://github.com/Yelp/amira",
     setup_requires="setuptools",
     packages=find_packages(exclude=["tests"]),
     provides=["amira"],
