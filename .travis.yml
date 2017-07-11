@@ -1,6 +1,12 @@
+language: python
+python:
+- '2.7'
+
 install:
-- sudo pip install tox
+- sudo pip install tox-travis
+
 script: make test
+
 deploy:
   provider: pypi
   user: yelplabs
