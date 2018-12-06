@@ -1,6 +1,7 @@
 ![amira](amira_github_banner.png)
 
 [![PyPI](https://img.shields.io/pypi/v/amira.svg)](https://pypi.python.org/pypi/amira)
+[![Build Status](https://travis-ci.org/Yelp/amira.svg?branch=master)](https://travis-ci.org/Yelp/amira)
 
 # AMIRA: Automated Malware Incident Response & Analysis
 
