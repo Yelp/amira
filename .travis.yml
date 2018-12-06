@@ -4,11 +4,11 @@ python:
 
 env:
   global:
-    - BOTO_CONFIG=/tmp/nowhere
+    - BOTO_CONFIG=/dev/null
 
 install:
+  - pip install google-compute-engine
   - pip install tox-travis
-  - pip install -r requirements.txt
 
 script: make test
 
