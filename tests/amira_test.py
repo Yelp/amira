@@ -99,13 +99,13 @@ class TestAmira():
             call([
                 ('AMIRA-301.tar.gz', ANY, 'application/gzip'),
                 ('AMIRA-301_analysis.json', ANY, 'application/json'),
-                ('AMIRA-301_summary.txt', ANY, 'text'),
+                ('AMIRA-301_summary.txt', ANY, 'text/plain'),
                 ('AMIRA-301_summary.html', ANY, 'text/html; charset=UTF-8'),
             ]),
             call([
                 ('AMIRA-302.tar.gz', ANY, 'application/gzip'),
                 ('AMIRA-302_analysis.json', ANY, 'application/json'),
-                ('AMIRA-302_summary.txt', ANY, 'text'),
+                ('AMIRA-302_summary.txt', ANY, 'text/plain'),
                 ('AMIRA-302_summary.html', ANY, 'text/html; charset=UTF-8'),
             ]),
         ] == self._results_uploader_mock.upload_results.call_args_list

@@ -156,7 +156,7 @@ class AMIRA():
                 'application/json'),
             FileMetaInfo(
                 text_analysis_summary_filename, self._text_analysis_summary,
-                'text'),
+                'text/plain'),
             FileMetaInfo(
                 html_analysis_summary_filename, self._html_analysis_summary,
                 'text/html; charset=UTF-8'),

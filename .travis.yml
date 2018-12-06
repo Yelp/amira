@@ -1,9 +1,13 @@
 language: python
 python:
-- '2.7'
+  - '2.7'
+
+env:
+  global:
+    - BOTO_CONFIG=/dev/null
 
 install:
-- sudo pip install tox-travis
+  - pip install tox-travis
 
 script: make test
 
