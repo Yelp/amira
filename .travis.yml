@@ -3,6 +3,8 @@ python:
 - '2.7'
 
 install:
+- export BOTO_CONFIG=/dev/null
+- sudo pip install --upgrade pip
 - sudo pip install tox-travis
 
 script: make test
