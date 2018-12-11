@@ -33,3 +33,10 @@
         args:
         - --add-import
         - from __future__ import absolute_import
+-   repo: https://github.com/Yelp/detect-secrets
+    sha: 0.9.1
+    hooks:
+    -   id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: .*tests/.*|\.pre-commit-config\.yaml
+        language_version: python2.7
