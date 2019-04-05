@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -50,12 +51,18 @@ class S3ResultsUploader(ResultsUploader):
     def __init__(self, bucket_name):
         self._bucket_name = bucket_name
 
-        logging.info('Connecting to S3 to obtain access to {0} bucket.'.format(
-            bucket_name))
+        logging.info(
+            'Connecting to S3 to obtain access to {0} bucket.'.format(
+                bucket_name,
+            ),
+        )
         s3_connection = boto.connect_s3()
         self._bucket = s3_connection.get_bucket(bucket_name, validate=False)
-        logging.info('S3 bucket {0} retrieved successfully.'.format(
-            bucket_name))
+        logging.info(
+            'S3 bucket {0} retrieved successfully.'.format(
+                bucket_name,
+            ),
+        )
 
     def upload_results(self, results):
         """Uploads the analysis results to an S3 bucket.
@@ -68,7 +75,8 @@ class S3ResultsUploader(ResultsUploader):
         for file_meta_info in results:
             logging.info(
                 'Uploading the analysis results in the file "{0}" to the S3 '
-                'bucket "{1}"'.format(file_meta_info.name, self._bucket_name))
+                'bucket "{1}"'.format(file_meta_info.name, self._bucket_name),
+            )
             self._create_object_from_file(file_meta_info)
 
     def _create_object_from_file(self, file_meta_info):
@@ -79,4 +87,5 @@ class S3ResultsUploader(ResultsUploader):
         key.key = file_meta_info.name
         key.set_contents_from_file(
             file_meta_info.content,
-            headers={'Content-Type': file_meta_info.content_type})
+            headers={'Content-Type': file_meta_info.content_type},
+        )

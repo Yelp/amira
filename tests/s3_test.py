@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import boto
 import pytest
@@ -29,13 +30,16 @@ class TestS3Handler():
         key_mock.get_contents_as_string.return_value = 'test key contents'
 
         contents = s3_handler.get_contents_as_string(
-            'amira-test', 'MALWARE-1564-2016_01_11-10_55_12.tar.gz')
+            'amira-test', 'MALWARE-1564-2016_01_11-10_55_12.tar.gz',
+        )
 
         assert 'test key contents' == contents
         s3_connection_mock.get_bucket.assert_called_once_with(
-            'amira-test', validate=False)
+            'amira-test', validate=False,
+        )
         bucket_mock.get_key.assert_called_once_with(
-            'MALWARE-1564-2016_01_11-10_55_12.tar.gz')
+            'MALWARE-1564-2016_01_11-10_55_12.tar.gz',
+        )
         key_mock.get_contents_as_string.assert_called_once_with()
 
 
@@ -64,16 +68,21 @@ class TestS3ResultsUploader():
             s3_results_uploader.upload_results(results)
 
         s3_connection_mock.get_bucket.assert_called_once_with(
-            'lorem-ipsum', validate=False)
+            'lorem-ipsum', validate=False,
+        )
         assert [
-            ((ANY, fileobj_mock1), {
-                'headers': {
-                    'Content-Type': 'text/html; charset=UTF-8'
-                }
-            }),
-            ((ANY, fileobj_mock2), {
-                'headers': {
-                    'Content-Type': 'application/json'
-                }
-            }),
+            (
+                (ANY, fileobj_mock1), {
+                    'headers': {
+                        'Content-Type': 'text/html; charset=UTF-8',
+                    },
+                },
+            ),
+            (
+                (ANY, fileobj_mock2), {
+                    'headers': {
+                        'Content-Type': 'application/json',
+                    },
+                },
+            ),
         ] == patched_set_contents_from_file.call_args_list

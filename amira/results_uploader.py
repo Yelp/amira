@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from collections import namedtuple
 
@@ -23,4 +24,5 @@ class ResultsUploader():
         :type results: list of ``FileMetaInfo`` tuples
         """
         raise NotImplementedError(
-            'Derived classes must implement "upload_results()".')
+            'Derived classes must implement "upload_results()".',
+        )

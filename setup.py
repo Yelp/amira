@@ -32,20 +32,26 @@ from setuptools import setup
 
 from amira import __version__
 
+
+with open('README.md', 'r') as fh:
+    long_description = fh.read()
+
 setup(
-    name="amira",
+    name='amira',
     version=__version__,
-    description="Automated Malware Incident Response and Analysis",
-    author="Yelp Security",
-    author_email="opensource@yelp.com",
-    license="The MIT License (MIT)",
-    url="https://github.com/Yelp/amira",
-    setup_requires="setuptools",
-    packages=find_packages(exclude=["tests"]),
-    provides=["amira"],
+    description='Automated Malware Incident Response and Analysis',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    author='Yelp Security',
+    author_email='opensource@yelp.com',
+    license='The MIT License (MIT)',
+    url='https://github.com/Yelp/amira',
+    setup_requires='setuptools',
+    packages=find_packages(exclude=['tests']),
+    provides=['amira'],
     install_requires=[
-        "boto",
-        "osxcollector_output_filters",
-        "simplejson",
+        'boto',
+        'osxcollector_output_filters>=1.1.0',
+        'simplejson',
     ],
 )

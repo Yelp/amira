@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 from collections import namedtuple
@@ -47,8 +48,11 @@ class SqsHandler():
         if not self.sqs_queue:
             raise SqsQueueNotFoundException(queue_name)
 
-        logging.info('Successfully connected to {0} SQS queue'.format(
-            queue_name))
+        logging.info(
+            'Successfully connected to {0} SQS queue'.format(
+                queue_name,
+            ),
+        )
 
         self.sqs_queue.set_message_class(RawMessage)
 
@@ -58,13 +62,17 @@ class SqsHandler():
         name, key name) pairs describing these objects.
         """
         messages = self.sqs_queue.get_messages(MAX_NUMBER_MESSAGES)
-        logging.info('Received {0} message(s) from the SQS queue'.format(
-            len(messages)))
+        logging.info(
+            'Received {0} message(s) from the SQS queue'.format(
+                len(messages),
+            ),
+        )
 
         if messages:
             for message in messages:
                 objects_created = self._retrieve_created_objects_from_message(
-                    message)
+                    message,
+                )
 
                 for object_created in objects_created:
                     yield object_created
@@ -88,7 +96,8 @@ class SqsHandler():
         if 'Records' not in body:
             logging.warn(
                 '"Records" field not found in the SQS message. '
-                'Message body: {0}'.format(body))
+                'Message body: {0}'.format(body),
+            )
             return []
 
         records = body['Records']
@@ -96,7 +105,8 @@ class SqsHandler():
 
     def _extract_created_objects_from_records(self, records):
         logging.info(
-            'Found {0} record(s) in the SQS message'.format(len(records)))
+            'Found {0} record(s) in the SQS message'.format(len(records)),
+        )
 
         for record in records:
             bucket_name = record['s3']['bucket']['name']
@@ -111,4 +121,4 @@ class SqsQueueNotFoundException(Exception):
         self.queue_name = queue_name
 
     def __str__(self):
-        return "SQS queue {0} not found.".format(self.queue_name)
+        return 'SQS queue {0} not found.'.format(self.queue_name)
