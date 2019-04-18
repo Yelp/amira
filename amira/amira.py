@@ -89,14 +89,14 @@ class AMIRA():
 
         try:
             self._run_analyze_filter()
-        except Exception:
+        except Exception as exc:
             # Log the exception and do not try any recovery.
             # The message that caused the exception will be deleted from the
             # SQS queue to prevent the same exception from happening in the
             # future.
             logging.warning(
                 'Unexpected error while running the Analyze Filter for the '
-                'object: {0}'.format(created_object.key_name),
+                'object {}: {}'.format(created_object.key_name, exc),
             )
         try:
             self._upload_analysis_results(created_object.key_name)
@@ -155,6 +155,13 @@ class AMIRA():
         self._text_analysis_summary.seek(0)
         self._html_analysis_summary.seek(0)
 
+    @staticmethod
+    def _check_buffer_size(buffer):
+        buffer.seek(0, os.SEEK_END)
+        size = buffer.tell()
+        buffer.seek(0)
+        return size
+
     def _upload_analysis_results(self, osxcollector_output_filename):
         # drop the file extension (".tar.gz")
         filename_without_extension = osxcollector_output_filename[:-7]
@@ -187,7 +194,7 @@ class AMIRA():
                 'text/html; charset=UTF-8',
             ),
         ]
-        results = [res for res in results if os.path.exists(res.name)]
+        results = [res for res in results if AMIRA._check_buffer_size(res.content) > 0]
 
         for results_uploader in self._results_uploader:
             results_uploader.upload_results(results)

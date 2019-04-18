@@ -56,8 +56,8 @@ class TestAmira():
             S3Handler, 'get_contents_as_string', autospec=True, side_effect=contents,
         ) as self._patched_get_contents_as_string, patch.object(
             SqsHandler, '__init__', autospec=True, return_value=None,
-        ), patch(
-            'os.path.exists', return_value=True,
+        ), patch.object(
+            AMIRA, '_check_buffer_size', return_value=1,
         ), patch.object(
             SqsHandler, 'get_created_objects', autospec=True, side_effect=created_objects,
         ) as self._patched_get_created_objects:
