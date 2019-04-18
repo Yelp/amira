@@ -7,9 +7,9 @@ import os
 import tarfile
 
 try:
-    from cStringIO import StringIO
+    from cStringIO import StringIO as byte_buffer
 except ImportError:
-    from io import StringIO
+    from io import BytesIO as byte_buffer
 
 from osxcollector.output_filters.analyze import AnalyzeFilter
 from osxcollector.output_filters.base_filters.output_filter import _run_filter
@@ -114,7 +114,7 @@ class AMIRA():
         will raise `OSXCollectorOutputExtractionError`.
         """
         # create a file-like object based on the S3 object contents as string
-        fileobj = StringIO(self._osxcollector_output)
+        fileobj = byte_buffer(self._osxcollector_output)
         tar = tarfile.open(mode='r:gz', fileobj=fileobj)
         json_tarinfo = [t for t in tar if t.name.endswith('.json')]
 
@@ -134,9 +134,9 @@ class AMIRA():
         """Runs Analyze Filter on the OSXCollector output retrieved
         from an S3 bucket.
         """
-        self._analysis_output = StringIO()
-        self._text_analysis_summary = StringIO()
-        self._html_analysis_summary = StringIO()
+        self._analysis_output = byte_buffer()
+        self._text_analysis_summary = byte_buffer()
+        self._html_analysis_summary = byte_buffer()
 
         analyze_filter = AnalyzeFilter(
             monochrome=True,
@@ -172,7 +172,7 @@ class AMIRA():
         results = [
             FileMetaInfo(
                 osxcollector_output_filename,
-                StringIO(self._osxcollector_output), 'application/gzip',
+                byte_buffer(self._osxcollector_output), 'application/gzip',
             ),
             FileMetaInfo(
                 analysis_output_filename, self._analysis_output,

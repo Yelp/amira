@@ -67,8 +67,8 @@ class TestAmira():
 
     def test_run(self, tar_gz_mock, run_filter_mock):
         contents = [
-            'New Petitions Against Tax',
-            'Building Code Under Fire',
+            b'New Petitions Against Tax',
+            b'Building Code Under Fire',
         ]
         created_objects = [[
             CreatedObject(
@@ -127,7 +127,7 @@ class TestAmira():
     def test_fetch_and_process_osxcollector_no_json_file_in_tar_gz(
             self, tar_gz_mock, run_filter_mock,
     ):
-        contents = ['ETAOIN! SHRDLU! CMFWYP!']
+        contents = [b'ETAOIN! SHRDLU! CMFWYP!']
         created_objects = [[
             CreatedObject(
                 bucket_name='amira-test', key_name='MALWARE-302.tar.gz',
@@ -154,7 +154,7 @@ class TestAmira():
         """Tests the exception handling while running the Analyze
         Filter.
         """
-        contents = ['The European languages are members of the same family.']
+        contents = [b'The European languages are members of the same family.']
         created_objects = [[
             CreatedObject(
                 bucket_name='amira-test', key_name='MALWARE-303.tar.gz',
