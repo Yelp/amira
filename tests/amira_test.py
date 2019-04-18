@@ -56,6 +56,8 @@ class TestAmira():
             S3Handler, 'get_contents_as_string', autospec=True, side_effect=contents,
         ) as self._patched_get_contents_as_string, patch.object(
             SqsHandler, '__init__', autospec=True, return_value=None,
+        ), patch(
+            'os.path.exists', return_value=True,
         ), patch.object(
             SqsHandler, 'get_created_objects', autospec=True, side_effect=created_objects,
         ) as self._patched_get_created_objects:
@@ -166,5 +168,5 @@ class TestAmira():
             region_name, queue_name, contents, created_objects,
         )
 
-        assert not self._results_uploader_mock.upload_results.called
+        assert self._results_uploader_mock.upload_results.called
         assert run_filter_mock.called
