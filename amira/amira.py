@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
+import os
 import tarfile
 
 try:
@@ -67,10 +68,10 @@ class AMIRA():
         created_objects = self._sqs_handler.get_created_objects()
 
         for created_object in created_objects:
-            if (created_object.key_name.endswith('.tar.gz')):
+            if created_object.key_name.endswith('.tar.gz'):
                 self._process_created_object(created_object)
             else:
-                logging.warn(
+                logging.warning(
                     'S3 object {0} name should end with ".tar.gz"'
                     .format(created_object.key_name),
                 )
@@ -88,14 +89,20 @@ class AMIRA():
 
         try:
             self._run_analyze_filter()
-            self._upload_analysis_results(created_object.key_name)
         except Exception:
             # Log the exception and do not try any recovery.
             # The message that caused the exception will be deleted from the
             # SQS queue to prevent the same exception from happening in the
             # future.
-            logging.exception(
+            logging.warning(
                 'Unexpected error while running the Analyze Filter for the '
+                'object: {0}'.format(created_object.key_name),
+            )
+        try:
+            self._upload_analysis_results(created_object.key_name)
+        except Exception:
+            logging.exception(
+                'Unexpected error while uploading results for the '
                 'object: {0}'.format(created_object.key_name),
             )
 
@@ -180,6 +187,7 @@ class AMIRA():
                 'text/html; charset=UTF-8',
             ),
         ]
+        results = [res for res in results if os.path.exists(res.name)]
 
         for results_uploader in self._results_uploader:
             results_uploader.upload_results(results)
