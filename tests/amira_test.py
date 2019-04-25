@@ -35,9 +35,9 @@ def tar_gz_mock():
 def run_filter_mock():
     """Mocks `amira.amira._run_filter()`."""
     mock_run_filter = MagicMock()
-    amira.amira._run_filter = mock_run_filter
+    amira.amira.output_filter = mock_run_filter
     amira.amira.AnalyzeFilter = MagicMock()
-    return mock_run_filter
+    return mock_run_filter._run_filter
 
 
 class TestAmira():
