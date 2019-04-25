@@ -7,12 +7,14 @@ import os
 import tarfile
 
 try:
-    from cStringIO import StringIO as byte_buffer
+    from cStringIO import StringIO as ByteBuffer
+    from cStringIO import StringIO as StringBuffer
 except ImportError:
-    from io import BytesIO as byte_buffer
+    from io import BytesIO as ByteBuffer
+    from io import StringIO as StringBuffer
 
 from osxcollector.output_filters.analyze import AnalyzeFilter
-from osxcollector.output_filters.base_filters.output_filter import _run_filter
+from osxcollector.output_filters.base_filters import output_filter
 
 from amira.results_uploader import FileMetaInfo
 from amira.s3 import S3Handler
@@ -114,7 +116,7 @@ class AMIRA():
         will raise `OSXCollectorOutputExtractionError`.
         """
         # create a file-like object based on the S3 object contents as string
-        fileobj = byte_buffer(self._osxcollector_output)
+        fileobj = ByteBuffer(self._osxcollector_output)
         tar = tarfile.open(mode='r:gz', fileobj=fileobj)
         json_tarinfo = [t for t in tar if t.name.endswith('.json')]
 
@@ -134,9 +136,9 @@ class AMIRA():
         """Runs Analyze Filter on the OSXCollector output retrieved
         from an S3 bucket.
         """
-        self._analysis_output = byte_buffer()
-        self._text_analysis_summary = byte_buffer()
-        self._html_analysis_summary = byte_buffer()
+        self._analysis_output = StringBuffer()
+        self._text_analysis_summary = ByteBuffer()
+        self._html_analysis_summary = ByteBuffer()
 
         analyze_filter = AnalyzeFilter(
             monochrome=True,
@@ -144,7 +146,7 @@ class AMIRA():
             html_output_file=self._html_analysis_summary,
         )
 
-        _run_filter(
+        output_filter._run_filter(
             analyze_filter,
             input_stream=self._osxcollector_output_json_file,
             output_stream=self._analysis_output,
@@ -179,7 +181,7 @@ class AMIRA():
         results = [
             FileMetaInfo(
                 osxcollector_output_filename,
-                byte_buffer(self._osxcollector_output), 'application/gzip',
+                ByteBuffer(self._osxcollector_output), 'application/gzip',
             ),
             FileMetaInfo(
                 analysis_output_filename, self._analysis_output,
