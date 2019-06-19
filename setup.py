@@ -51,7 +51,7 @@ setup(
     provides=['amira'],
     install_requires=[
         'boto',
-        'osxcollector_output_filters>=1.1.0',
+        'osxcollector_output_filters>=1.1.1',
         'simplejson',
     ],
 )

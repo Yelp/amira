@@ -94,7 +94,7 @@ class SqsHandler():
         body = simplejson.loads(json_body)
 
         if 'Records' not in body:
-            logging.warn(
+            logging.warning(
                 '"Records" field not found in the SQS message. '
                 'Message body: {0}'.format(body),
             )

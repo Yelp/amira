@@ -50,6 +50,7 @@ class AMIRA():
         self._sqs_handler = SqsHandler(region_name, queue_name)
         self._s3_handler = S3Handler()
         self._results_uploader = []
+        self._data_feeds = {}
 
     def register_results_uploader(self, results_uploader):
         """Registers results uploader.
@@ -59,6 +60,15 @@ class AMIRA():
         finished.
         """
         self._results_uploader.append(results_uploader)
+
+    def register_data_feed(self, feed_name, generator):
+        """Register data input which to be used by the OsXCollector filters
+
+        :param feed_name: Name of the data feed
+        :param generator: Generator function providing the data
+        :return:
+        """
+        self._data_feeds[feed_name] = generator
 
     def run(self):
         """Fetches the OSXCollector output from an S3 bucket based on
@@ -144,6 +154,7 @@ class AMIRA():
             monochrome=True,
             text_output_file=self._text_analysis_summary,
             html_output_file=self._html_analysis_summary,
+            data_feeds=self._data_feeds,
         )
 
         output_filter._run_filter(
