@@ -1,7 +1,7 @@
 exclude: '^tests/output_filters/data/.*$'
 repos:
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    rev: v2.1.0
+    rev: v2.3.0
     hooks:
     -   id: check-json
     -   id: check-yaml
@@ -13,11 +13,11 @@ repos:
     -   id: flake8
     -   id: fix-encoding-pragma
 -   repo: git://github.com/pre-commit/mirrors-autopep8
-    rev: v1.4.3
+    rev: v1.4.4
     hooks:
     -   id: autopep8
 -   repo: git://github.com/asottile/reorder_python_imports
-    rev: v1.4.0
+    rev: v1.7.0
     hooks:
     -   id: reorder-python-imports
         args: [
@@ -26,11 +26,11 @@ repos:
         ]
         exclude: setup.py
 -   repo: git://github.com/asottile/add-trailing-comma
-    rev: v1.0.0
+    rev: v1.4.1
     hooks:
     -   id: add-trailing-comma
 -   repo: https://github.com/Yelp/detect-secrets
-    rev: v0.12.2
+    rev: v0.12.7
     hooks:
     -   id: detect-secrets
         args: ['--baseline', '.secrets.baseline']

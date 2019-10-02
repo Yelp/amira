@@ -1,7 +1,6 @@
 -r requirements.txt
-coverage==4.5.3
-flake8==3.7.7
-mock==2.0.0
+coverage==4.5.4
+flake8==3.7.8
+mock==3.0.5
 pre-commit>=1.0.0
-pytest==4.4.0
-tox==3.8.6
+pytest==4.6.5

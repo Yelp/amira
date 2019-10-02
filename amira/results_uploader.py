@@ -8,7 +8,7 @@ from collections import namedtuple
 FileMetaInfo = namedtuple('FileMetaInfo', ['name', 'content', 'content_type'])
 
 
-class ResultsUploader():
+class ResultsUploader(object):
 
     """Parent class for the AMIRA results uploaders. Results uploaders
     should expose a single method, ``upload_results()``, that should
