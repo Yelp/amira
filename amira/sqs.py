@@ -18,7 +18,7 @@ MAX_NUMBER_MESSAGES = 10
 CreatedObject = namedtuple('ObjectCreated', ['bucket_name', 'key_name'])
 
 
-class SqsHandler():
+class SqsHandler(object):
     """Retrieves the S3 event notifications about the objects created
     in the bucket for which the notifications were configured.
 

@@ -1,4 +1,3 @@
-boto==2.38.0
-gevent==1.2.2
+boto==2.49.0
 osxcollector_output_filters==1.1.1
-simplejson==3.10.0
+simplejson==3.16.0

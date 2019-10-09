@@ -10,7 +10,7 @@ from boto.s3.key import Key
 from amira.results_uploader import ResultsUploader
 
 
-class S3Handler():
+class S3Handler(object):
     """Handles the operations with S3, like retrieving the key
     (object) contents from a bucket and creating a new key
     (object) with the contents of a given file.

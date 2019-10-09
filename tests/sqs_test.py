@@ -67,7 +67,7 @@ def mock_s3_event_notifications(
     return s3_event_notification_message_mocks
 
 
-class TestSqsHandler():
+class TestSqsHandler(object):
 
     def test_queue_not_found(self):
         boto.sqs.connect_to_region = MagicMock()

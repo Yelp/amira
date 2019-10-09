@@ -14,7 +14,7 @@ from amira.s3 import S3Handler
 from amira.s3 import S3ResultsUploader
 
 
-class TestS3Handler():
+class TestS3Handler(object):
 
     """Tests ``amira.s3.S3Handler`` class."""
 
