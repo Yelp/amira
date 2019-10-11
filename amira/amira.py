@@ -97,7 +97,7 @@ class AMIRA(object):
         processed_input = self._data_processor.process_input(forensic_output)
 
         try:
-            self._data_processor.perform_analysis(processed_input)
+            self._data_processor.perform_analysis(processed_input, self._data_feeds)
         except Exception as exc:
             # Log the exception and do not try any recovery.
             # The message that caused the exception will be deleted from the
