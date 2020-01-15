@@ -55,6 +55,8 @@ class DataProcessor(object):
         ]
         if results:
             for res_uploader in result_uploaders:
+                for res in results:
+                    res.content.seek(0)
                 res_uploader.upload_results(results)
         else:
             logging.warning('No results to upload for {}'.format(file_basename))
