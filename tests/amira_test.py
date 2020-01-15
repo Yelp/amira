@@ -8,6 +8,10 @@ from mock import ANY
 from mock import call
 from mock import MagicMock
 from mock import patch
+try:
+    from cStringIO import StringIO as ByteBuffer
+except ImportError:
+    from io import BytesIO as ByteBuffer
 
 from amira.amira import AMIRA
 from amira.data_processor import DataProcessor
@@ -60,7 +64,7 @@ class TestAmira(object):
         mock_processor = DataProcessor()
 
         def mock_process_input(o, _):
-            o._results = [FileMetaInfo('.tar.gz', b'1', 'application/gzip')]
+            o._results = [FileMetaInfo('.tar.gz', ByteBuffer(b'1'), 'application/gzip')]
         mock_processor.process_input = types.MethodType(mock_process_input, mock_processor)
         mock_processor.perform_analysis = MagicMock()
         region_name, queue_name = 'us-west-2', 'etaoin-shrdlu'
