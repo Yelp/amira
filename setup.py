@@ -50,7 +50,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     provides=['amira'],
     install_requires=[
-        'boto',
+        'boto3',
         'osxcollector_output_filters>=1.1.1',
         'simplejson',
     ],
