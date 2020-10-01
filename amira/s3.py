@@ -4,6 +4,15 @@ from __future__ import unicode_literals
 
 import logging
 
+try:
+    from cStringIO import StringIO as ByteBuffer
+    from cStringIO import StringIO as StringBuffer
+    IN_PY3 = False
+except ImportError:
+    from io import BytesIO as ByteBuffer
+    from io import StringIO as StringBuffer
+    IN_PY3 = True
+
 import boto3
 
 from amira.results_uploader import ResultsUploader
@@ -60,9 +69,14 @@ class S3ResultsUploader(ResultsUploader):
                 'Uploading the analysis results in the file "{0}" to the S3 '
                 'bucket "{1}"'.format(file_meta_info.name, self._bucket_name),
             )
+            body = (
+                ByteBuffer(file_meta_info.content.getvalue().encode())
+                if IN_PY3 and isinstance(file_meta_info.content, StringBuffer)
+                else file_meta_info.content
+            )
             self._s3_connection.put_object(
                 Bucket=self._bucket_name,
                 Key=file_meta_info.name,
                 ContentType=file_meta_info.content_type,
-                Body=file_meta_info.content,
+                Body=body,
             )
