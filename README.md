@@ -43,9 +43,9 @@ also available when running AMIRA.
 
 ### AWS credentials
 
-AMIRA uses boto to interface with AWS.
-You can supply the credentials using either of the possible
-[boto config files](http://boto.cloudhackers.com/en/latest/boto_config_tut.html#details).
+AMIRA uses boto3 to interface with AWS.
+You can supply credentials using either of the possible
+[configuration options](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html).
 
 The credentials should allow reading and deleting SQS messages
 from the SQS queue specified in the AMIRA config as well as
