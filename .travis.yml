@@ -35,4 +35,4 @@ deploy:
     tags: true
     repo: Yelp/amira
     branch: master
-    condition: $TRAVIS_BUILD_STAGE_NAME = Deploy
+    condition: $TRAVIS_BUILD_STAGE_NAME = deploy
