@@ -1,9 +1,6 @@
 .DELETE_ON_ERROR:
 
-all: production
-
-production:
-	@true
+all: install-hooks test
 
 test:
 	tox
@@ -11,7 +8,7 @@ test:
 venv:
 	tox -evenv
 
-install-hooks:
+install-hooks: venv
 	pre-commit install -f --install-hooks
 
 clean:
@@ -20,4 +17,4 @@ clean:
 	find . -name '*.pyc' -delete
 	find . -name '__pycache__' -delete
 
-.PHONY: all production test venv install-hooks clean
+.PHONY: all test venv install-hooks clean
