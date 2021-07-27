@@ -3,11 +3,13 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import tarfile
+import logging
 
 import pytest
 from mock import ANY
 from mock import MagicMock
 from mock import patch
+from mock import call
 
 try:
     from cStringIO import StringIO as ByteBuffer
@@ -56,6 +58,13 @@ class TestOSXCollectorDataProcessor(object):
         output = processor.process_input(input_data)
         assert output.read() == b'{"a":2}\n'
         assert len(processor._results) == 1
+
+    def test_process_input_malformed_gz(self, tar_gz_mock):
+        logging.error = MagicMock()
+        processor = OSXCollectorDataProcessor()
+        tarfile.open.side_effect = tarfile.ReadError('mock.tar.gz is not a gz file')
+        processor.process_input(b'things')
+        logging.error.assert_has_calls([call(u'Failed to read the archive: mock.tar.gz is not a gz file')])
 
     def test_process_input_no_json(self, tar_gz_mock):
         processor = OSXCollectorDataProcessor()

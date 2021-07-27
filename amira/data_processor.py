@@ -88,7 +88,13 @@ class OSXCollectorDataProcessor(DataProcessor):
         self._results = [FileMetaInfo('.tar.gz', ByteBuffer(tardata), 'application/gzip')]
         # create a file-like object based on the S3 object contents as string
         fileobj = ByteBuffer(tardata)
-        tar = tarfile.open(mode='r:gz', fileobj=fileobj)
+        tar = None
+        try:
+            tar = tarfile.open(mode='r:gz', fileobj=fileobj)
+        except tarfile.ReadError as ter:
+            logging.error('Failed to read the archive: {}'.format(ter))
+            return
+
         json_tarinfo = [t for t in tar if t.name.endswith('.json')]
 
         if len(json_tarinfo) != 1:

@@ -96,6 +96,10 @@ class AMIRA(object):
         )
         processed_input = self._data_processor.process_input(forensic_output)
 
+        if not processed_input:
+            logging.error('No input to process')
+            return
+
         try:
             self._data_processor.perform_analysis(processed_input, self._data_feeds)
         except Exception as exc:

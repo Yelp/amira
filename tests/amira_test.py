@@ -65,6 +65,7 @@ class TestAmira(object):
 
         def mock_process_input(o, _):
             o._results = [FileMetaInfo('.tar.gz', ByteBuffer(b'1'), 'application/gzip')]
+            return MagicMock()
         mock_processor.process_input = types.MethodType(mock_process_input, mock_processor)
         mock_processor.perform_analysis = MagicMock()
         region_name, queue_name = 'us-west-2', 'etaoin-shrdlu'
