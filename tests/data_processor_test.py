@@ -2,14 +2,14 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import tarfile
 import logging
+import tarfile
 
 import pytest
 from mock import ANY
+from mock import call
 from mock import MagicMock
 from mock import patch
-from mock import call
 
 try:
     from cStringIO import StringIO as ByteBuffer
