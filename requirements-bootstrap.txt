@@ -1,6 +1,4 @@
-pip==19.2
-pip-custom-platform==0.5.0
-pymonkey==0.2.2
-setuptools==39.0.1
-venv-update==3.0.0
-wheel==0.30.0
+pip==20.3
+venv-update==3.2.4
+virtualenv==16.7.7
+wheel==0.32.3
