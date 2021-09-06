@@ -94,14 +94,11 @@ class AMIRA(object):
         forensic_output = self._s3_handler.get_contents_as_string(
             created_object.bucket_name, created_object.key_name,
         )
-        processed_input = self._data_processor.process_input(forensic_output)
-
-        if not processed_input:
-            logging.error('No input to process')
-            return
 
         try:
-            self._data_processor.perform_analysis(processed_input, self._data_feeds)
+            processed_input = self._data_processor.process_input(forensic_output)
+            if processed_input:
+                self._data_processor.perform_analysis(processed_input, self._data_feeds)
         except Exception as exc:
             # Log the exception and do not try any recovery.
             # The message that caused the exception will be deleted from the
