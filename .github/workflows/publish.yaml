@@ -19,10 +19,10 @@ jobs:
         python-version: '3.13'
 
     - name: Install Python dependencies
-      run: pip install wheel
+      run: pip3 install wheel setuptools
 
     - name: Create a Wheel file and source distribution
-      run: python setup.py sdist bdist_wheel
+      run: python3 setup.py sdist bdist_wheel
 
     - name: Publish distribution package to PyPI
       uses: pypa/gh-action-pypi-publish@v1.14.0
