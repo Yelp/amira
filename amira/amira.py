@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import logging
 
 from amira.data_processor import OSXCollectorDataProcessor
@@ -9,7 +5,7 @@ from amira.s3 import S3Handler
 from amira.sqs import SqsHandler
 
 
-class AMIRA(object):
+class AMIRA:
     """Runs the automated analysis based on the new elements in an S3
     bucket:
         1. Receives the messages from the SQS queue about the new
@@ -77,12 +73,13 @@ class AMIRA(object):
         created_objects = self._sqs_handler.get_created_objects()
 
         for created_object in created_objects:
-            if created_object.key_name.endswith('.tar.gz'):
+            if created_object.key_name.endswith(".tar.gz"):
                 self._process_created_object(created_object)
             else:
                 logging.warning(
-                    'S3 object {0} name should end with ".tar.gz"'
-                    .format(created_object.key_name),
+                    'S3 object {} name should end with ".tar.gz"'.format(
+                        created_object.key_name,
+                    ),
                 )
 
     def _process_created_object(self, created_object):
@@ -92,7 +89,8 @@ class AMIRA(object):
         """
         # fetch forensic data from the S3 bucket
         forensic_output = self._s3_handler.get_contents_as_string(
-            created_object.bucket_name, created_object.key_name,
+            created_object.bucket_name,
+            created_object.key_name,
         )
 
         try:
@@ -105,15 +103,16 @@ class AMIRA(object):
             # SQS queue to prevent the same exception from happening in the
             # future.
             logging.warning(
-                'Unexpected error while running the Analyze Filter for the '
-                'object {}: {}'.format(created_object.key_name, exc),
+                "Unexpected error while running the Analyze Filter for the "
+                "object {}: {}".format(created_object.key_name, exc),
             )
         try:
             self._data_processor.upload_results(
-                created_object.key_name[:-7], self._results_uploader,
+                created_object.key_name[:-7],
+                self._results_uploader,
             )
         except Exception:
             logging.exception(
-                'Unexpected error while uploading results for the '
-                'object: {0}'.format(created_object.key_name),
+                "Unexpected error while uploading results for the "
+                "object: {}".format(created_object.key_name),
             )

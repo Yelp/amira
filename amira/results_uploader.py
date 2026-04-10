@@ -1,15 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 from collections import namedtuple
 
 
-FileMetaInfo = namedtuple('FileMetaInfo', ['name', 'content', 'content_type'])
+FileMetaInfo = namedtuple("FileMetaInfo", ["name", "content", "content_type"])
 
 
-class ResultsUploader(object):
-
+class ResultsUploader:
     """Parent class for the AMIRA results uploaders. Results uploaders
     should expose a single method, ``upload_results()``, that should
     take a list of ``FileMetaInfo`` tuples.

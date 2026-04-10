@@ -1,24 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import logging
-
-try:
-    from cStringIO import StringIO as ByteBuffer
-    from cStringIO import StringIO as StringBuffer
-    IN_PY3 = False
-except ImportError:
-    from io import BytesIO as ByteBuffer
-    from io import StringIO as StringBuffer
-    IN_PY3 = True
+from io import BytesIO as ByteBuffer
 
 import boto3
 
 from amira.results_uploader import ResultsUploader
 
 
-class S3Handler(object):
+class S3Handler:
     """Handles the operations with S3, like retrieving the key
     (object) contents from a bucket and creating a new key
     (object) with the contents of a given file.
@@ -28,7 +16,7 @@ class S3Handler(object):
     """
 
     def __init__(self):
-        self._s3_connection = boto3.client('s3')
+        self._s3_connection = boto3.client("s3")
 
     def get_contents_as_string(self, bucket_name, key_name):
         """Retrieves the S3 key (object) contents.
@@ -41,7 +29,7 @@ class S3Handler(object):
         :rtype: bytes
         """
         response = self._s3_connection.get_object(Bucket=bucket_name, Key=key_name)
-        return response['Body'].read()
+        return response["Body"].read()
 
 
 class S3ResultsUploader(ResultsUploader):
@@ -54,7 +42,7 @@ class S3ResultsUploader(ResultsUploader):
 
     def __init__(self, bucket_name):
         self._bucket_name = bucket_name
-        self._s3_connection = boto3.client('s3')
+        self._s3_connection = boto3.client("s3")
 
     def upload_results(self, results):
         """Uploads the analysis results to an S3 bucket.
@@ -66,14 +54,10 @@ class S3ResultsUploader(ResultsUploader):
         """
         for file_meta_info in results:
             logging.info(
-                'Uploading the analysis results in the file "{0}" to the S3 '
-                'bucket "{1}"'.format(file_meta_info.name, self._bucket_name),
+                'Uploading the analysis results in the file "{}" to the S3 '
+                'bucket "{}"'.format(file_meta_info.name, self._bucket_name),
             )
-            body = (
-                ByteBuffer(file_meta_info.content.getvalue().encode())
-                if IN_PY3 and isinstance(file_meta_info.content, StringBuffer)
-                else file_meta_info.content
-            )
+            body = ByteBuffer(file_meta_info.content.getvalue().encode())
             self._s3_connection.put_object(
                 Bucket=self._bucket_name,
                 Key=file_meta_info.name,

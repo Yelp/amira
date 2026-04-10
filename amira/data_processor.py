@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import logging
 import os
 import tarfile
@@ -19,7 +15,7 @@ from osxcollector.output_filters.base_filters import output_filter
 from amira.results_uploader import FileMetaInfo
 
 
-class DataProcessor(object):
+class DataProcessor:
 
     def __init__(self):
         # List to store processing outputs
@@ -50,8 +46,10 @@ class DataProcessor(object):
         :param result_uploaders: List of Uploader objects to invoke
         """
         results = [
-            FileMetaInfo(file_basename + res.name, res.content, res.content_type) for res in self._results
-            if isinstance(res, FileMetaInfo) and DataProcessor.get_buffer_size(res.content) > 0
+            FileMetaInfo(file_basename + res.name, res.content, res.content_type)
+            for res in self._results
+            if isinstance(res, FileMetaInfo)
+            and DataProcessor.get_buffer_size(res.content) > 0
         ]
         if results:
             for res_uploader in result_uploaders:
@@ -59,7 +57,7 @@ class DataProcessor(object):
                     res.content.seek(0)
                 res_uploader.upload_results(results)
         else:
-            logging.warning('No results to upload for {}'.format(file_basename))
+            logging.warning("No results to upload for {}".format(file_basename))
 
     @staticmethod
     def get_buffer_size(data_buffer):
@@ -85,26 +83,28 @@ class OSXCollectorDataProcessor(DataProcessor):
 
         :param tardata: Input TAR archive data
         """
-        self._results = [FileMetaInfo('.tar.gz', ByteBuffer(tardata), 'application/gzip')]
+        self._results = [
+            FileMetaInfo(".tar.gz", ByteBuffer(tardata), "application/gzip"),
+        ]
         # create a file-like object based on the S3 object contents as string
         fileobj = ByteBuffer(tardata)
         tar = None
         try:
-            tar = tarfile.open(mode='r:gz', fileobj=fileobj)
+            tar = tarfile.open(mode="r:gz", fileobj=fileobj)
         except tarfile.ReadError as ter:
-            logging.error('Failed to read the archive: {}'.format(ter))
+            logging.error("Failed to read the archive: {}".format(ter))
             return
 
-        json_tarinfo = [t for t in tar if t.name.endswith('.json')]
+        json_tarinfo = [t for t in tar if t.name.endswith(".json")]
 
         if len(json_tarinfo) != 1:
             raise OSXCollectorOutputExtractionError(
-                'Expected 1 JSON file inside the OSXCollector output archive, '
-                'but found {0} instead.'.format(len(json_tarinfo)),
+                "Expected 1 JSON file inside the OSXCollector output archive, "
+                "but found {} instead.".format(len(json_tarinfo)),
             )
 
         tarinfo = json_tarinfo[0]
-        logging.info('Extracted OSXCollector output JSON file {0}'.format(tarinfo.name))
+        logging.info("Extracted OSXCollector output JSON file {}".format(tarinfo.name))
         return tar.extractfile(tarinfo)
 
     def perform_analysis(self, input_stream, data_feeds=None):
@@ -137,9 +137,13 @@ class OSXCollectorDataProcessor(DataProcessor):
         html_analysis_summary.seek(0)
 
         self._results += [
-            FileMetaInfo('_analysis.json', analysis_output, 'application/json'),
-            FileMetaInfo('_summary.txt', text_analysis_summary, 'text/plain'),
-            FileMetaInfo('_summary.html', html_analysis_summary, 'text/html; charset=UTF-8'),
+            FileMetaInfo("_analysis.json", analysis_output, "application/json"),
+            FileMetaInfo("_summary.txt", text_analysis_summary, "text/plain"),
+            FileMetaInfo(
+                "_summary.html",
+                html_analysis_summary,
+                "text/html; charset=UTF-8",
+            ),
         ]
 
 
@@ -147,4 +151,5 @@ class OSXCollectorOutputExtractionError(Exception):
     """Raised when an unexpected number of JSON files is found in the
     OSXCollector output archive.
     """
+
     pass

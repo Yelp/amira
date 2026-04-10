@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Even for a larger incident response team handling all of the repetitive tasks
 related to malware infections is a tedious task. Our malware analysts have
@@ -25,7 +24,6 @@ investigation. Thanks to that, the incident response team members can focus on
 what they excel at: finding unusual patterns and the novel ways that malware
 was trying to sneak into the corporate infrastructure.
 """
-from __future__ import absolute_import
 
 from setuptools import find_packages
 from setuptools import setup
@@ -33,25 +31,25 @@ from setuptools import setup
 from amira import __version__
 
 
-with open('README.md', 'r') as fh:
+with open("README.md") as fh:
     long_description = fh.read()
 
 setup(
-    name='amira',
+    name="amira",
     version=__version__,
-    description='Automated Malware Incident Response and Analysis',
+    description="Automated Malware Incident Response and Analysis",
     long_description=long_description,
-    long_description_content_type='text/markdown',
-    author='Yelp Security',
-    author_email='opensource@yelp.com',
-    license='The MIT License (MIT)',
-    url='https://github.com/Yelp/amira',
-    setup_requires='setuptools',
-    packages=find_packages(exclude=['tests']),
-    provides=['amira'],
+    long_description_content_type="text/markdown",
+    author="Yelp Security",
+    author_email="opensource@yelp.com",
+    license="The MIT License (MIT)",
+    url="https://github.com/Yelp/amira",
+    setup_requires="setuptools",
+    packages=find_packages(exclude=["tests"]),
+    provides=["amira"],
     install_requires=[
-        'boto3',
-        'osxcollector_output_filters>=1.1.1',
-        'simplejson',
+        "boto3",
+        "osxcollector_output_filters>=1.1.1",
     ],
+    python_requires=">=3.6",
 )
