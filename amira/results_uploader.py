@@ -1,7 +1,14 @@
-from collections import namedtuple
+from io import BytesIO
+from io import StringIO
+from typing import List
+from typing import NamedTuple
+from typing import Union
 
 
-FileMetaInfo = namedtuple("FileMetaInfo", ["name", "content", "content_type"])
+class FileMetaInfo(NamedTuple):
+    name: str
+    content: Union[StringIO, BytesIO]
+    content_type: str
 
 
 class ResultsUploader:
@@ -10,7 +17,7 @@ class ResultsUploader:
     take a list of ``FileMetaInfo`` tuples.
     """
 
-    def upload_results(self, results):
+    def upload_results(self, results: List[FileMetaInfo]) -> None:
         """Uploads the analysis results to a desired destination.
 
         :param results: The list containing the meta info (name,

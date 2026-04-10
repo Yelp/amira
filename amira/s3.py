@@ -1,8 +1,11 @@
 import logging
 from io import BytesIO as ByteBuffer
+from io import StringIO as StringBuffer
+from typing import List
 
 import boto3
 
+from amira.results_uploader import FileMetaInfo
 from amira.results_uploader import ResultsUploader
 
 
@@ -15,10 +18,10 @@ class S3Handler:
     the resources.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._s3_connection = boto3.client("s3")
 
-    def get_contents_as_string(self, bucket_name, key_name):
+    def get_contents_as_string(self, bucket_name: str, key_name: str) -> bytes:
         """Retrieves the S3 key (object) contents.
 
         :param bucket_name: The S3 bucket name.
@@ -40,11 +43,11 @@ class S3ResultsUploader(ResultsUploader):
     :type bucket_name: string
     """
 
-    def __init__(self, bucket_name):
+    def __init__(self, bucket_name: str) -> None:
         self._bucket_name = bucket_name
         self._s3_connection = boto3.client("s3")
 
-    def upload_results(self, results):
+    def upload_results(self, results: List[FileMetaInfo]) -> None:
         """Uploads the analysis results to an S3 bucket.
 
         :param results: The list containing the meta info (name,
@@ -57,7 +60,11 @@ class S3ResultsUploader(ResultsUploader):
                 'Uploading the analysis results in the file "{}" to the S3 '
                 'bucket "{}"'.format(file_meta_info.name, self._bucket_name),
             )
-            body = ByteBuffer(file_meta_info.content.getvalue().encode())
+            body = (
+                ByteBuffer(file_meta_info.content.getvalue().encode())
+                if isinstance(file_meta_info.content, StringBuffer)
+                else file_meta_info.content
+            )
             self._s3_connection.put_object(
                 Bucket=self._bucket_name,
                 Key=file_meta_info.name,

@@ -1,6 +1,11 @@
 import json
 import logging
-from collections import namedtuple
+from typing import Any
+from typing import Dict
+from typing import Generator
+from typing import Iterable
+from typing import List
+from typing import NamedTuple
 
 import boto3
 
@@ -10,7 +15,9 @@ import boto3
 MAX_NUMBER_MESSAGES = 10
 
 
-CreatedObject = namedtuple("ObjectCreated", ["bucket_name", "key_name"])
+class CreatedObject(NamedTuple):
+    bucket_name: str
+    key_name: str
 
 
 class SqsHandler:
@@ -26,7 +33,7 @@ class SqsHandler:
     :type queue_name: string
     """
 
-    def __init__(self, region_name, queue_name):
+    def __init__(self, region_name: str, queue_name: str) -> None:
         """Connects to the SQS queue in a given AWS region.
 
         :param region_name: The AWS region name.
@@ -40,7 +47,7 @@ class SqsHandler:
             "Successfully connected to {} SQS queue".format(queue_name),
         )
 
-    def get_created_objects(self):
+    def get_created_objects(self) -> Generator[CreatedObject, None, None]:
         """Retrieves the S3 event notifications about the objects
         created in the OSXCollector output bucket yields the (bucket
         name, key name) pairs describing these objects.
@@ -57,7 +64,10 @@ class SqsHandler:
                 yield from objects_created
                 message.delete()
 
-    def _retrieve_created_objects_from_message(self, message):
+    def _retrieve_created_objects_from_message(
+        self,
+        message: Any,
+    ) -> Iterable[CreatedObject]:
         """Retrieves the bucket name and the key name, describing the
         created object, from the `Records` array in the SQS message.
 
@@ -77,7 +87,10 @@ class SqsHandler:
             return []
         return self._extract_created_objects_from_records(body["Records"])
 
-    def _extract_created_objects_from_records(self, records):
+    def _extract_created_objects_from_records(
+        self,
+        records: List[Dict[str, Any]],
+    ) -> Generator[CreatedObject, None, None]:
         logging.info(
             "Found {} record(s) in the SQS message".format(len(records)),
         )

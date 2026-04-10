@@ -1,7 +1,14 @@
 import logging
+from typing import Any
+from typing import Dict
+from typing import Generator
+from typing import List
 
+from amira.data_processor import DataProcessor
 from amira.data_processor import OSXCollectorDataProcessor
+from amira.results_uploader import ResultsUploader
 from amira.s3 import S3Handler
+from amira.sqs import CreatedObject
 from amira.sqs import SqsHandler
 
 
@@ -30,14 +37,14 @@ class AMIRA:
     :type queue_name: string
     """
 
-    def __init__(self, region_name, queue_name):
+    def __init__(self, region_name: str, queue_name: str) -> None:
         self._sqs_handler = SqsHandler(region_name, queue_name)
         self._s3_handler = S3Handler()
-        self._results_uploader = []
-        self._data_feeds = {}
-        self._data_processor = OSXCollectorDataProcessor()
+        self._results_uploader: List[ResultsUploader] = []
+        self._data_feeds: Dict[str, Generator[Any, None, None]] = {}
+        self._data_processor: DataProcessor = OSXCollectorDataProcessor()
 
-    def register_results_uploader(self, results_uploader):
+    def register_results_uploader(self, results_uploader: ResultsUploader) -> None:
         """Registers results uploader.
 
         Results uploader will upload the analysis results and the
@@ -46,7 +53,11 @@ class AMIRA:
         """
         self._results_uploader.append(results_uploader)
 
-    def register_data_feed(self, feed_name, generator):
+    def register_data_feed(
+        self,
+        feed_name: str,
+        generator: Generator[Any, None, None],
+    ) -> None:
         """Register data input which to be used by the OsXCollector filters
 
         :param feed_name: Name of the data feed
@@ -54,7 +65,7 @@ class AMIRA:
         """
         self._data_feeds[feed_name] = generator
 
-    def register_data_processor(self, processor):
+    def register_data_processor(self, processor: DataProcessor) -> None:
         """Registers DataProcessor object to process and analyze input data from S3.
         If no processor is registered Amira will fall back using the default
         OSXCollector result processor.
@@ -63,7 +74,7 @@ class AMIRA:
         """
         self._data_processor = processor
 
-    def run(self):
+    def run(self) -> None:
         """Fetches the OSXCollector output from an S3 bucket based on
         the S3 ObjectCreated event notifications and runs the Analyze
         Filter on the output file.
@@ -82,7 +93,7 @@ class AMIRA:
                     ),
                 )
 
-    def _process_created_object(self, created_object):
+    def _process_created_object(self, created_object: CreatedObject) -> None:
         """Fetches the object from an S3 bucket and runs the analysis.
         Then it sends the results to the target S3 bucket and attaches
         them to the JIRA ticket.
