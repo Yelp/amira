@@ -1,31 +1,32 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import logging
 import os
 import tarfile
-
-try:
-    from cStringIO import StringIO as ByteBuffer
-    from cStringIO import StringIO as StringBuffer
-except ImportError:
-    from io import BytesIO as ByteBuffer
-    from io import StringIO as StringBuffer
+from io import BytesIO as ByteBuffer
+from io import StringIO as StringBuffer
+from typing import Any
+from typing import BinaryIO
+from typing import cast
+from typing import Collection
+from typing import Dict
+from typing import Generator
+from typing import IO
+from typing import List
+from typing import Optional
 
 from osxcollector.output_filters.analyze import AnalyzeFilter
 from osxcollector.output_filters.base_filters import output_filter
 
 from amira.results_uploader import FileMetaInfo
+from amira.results_uploader import ResultsUploader
 
 
-class DataProcessor(object):
+class DataProcessor:
 
-    def __init__(self):
+    def __init__(self) -> None:
         # List to store processing outputs
-        self._results = []
+        self._results: List[FileMetaInfo] = []
 
-    def process_input(self, tardata):
+    def process_input(self, tardata: bytes) -> Optional[BinaryIO]:
         """Process input TAR file
 
         :param tardata: TAR byte stream
@@ -33,7 +34,11 @@ class DataProcessor(object):
         """
         raise NotImplementedError()
 
-    def perform_analysis(self, input_stream, data_feeds=None):
+    def perform_analysis(
+        self,
+        input_stream: BinaryIO,
+        data_feeds: Optional[Dict[str, Generator[Any, None, None]]] = None,
+    ) -> None:
         """Perform analysis of forensic input.
         Analysis results should be handled as internal object state
 
@@ -42,7 +47,11 @@ class DataProcessor(object):
         """
         raise NotImplementedError()
 
-    def upload_results(self, file_basename, result_uploaders):
+    def upload_results(
+        self,
+        file_basename: str,
+        result_uploaders: Collection[ResultsUploader],
+    ) -> None:
         """Upload forensic results.
         These must be stored as FileMetaInfo objects in the `_results` list attribute
 
@@ -50,8 +59,10 @@ class DataProcessor(object):
         :param result_uploaders: List of Uploader objects to invoke
         """
         results = [
-            FileMetaInfo(file_basename + res.name, res.content, res.content_type) for res in self._results
-            if isinstance(res, FileMetaInfo) and DataProcessor.get_buffer_size(res.content) > 0
+            FileMetaInfo(file_basename + res.name, res.content, res.content_type)
+            for res in self._results
+            if isinstance(res, FileMetaInfo)
+            and DataProcessor.get_buffer_size(res.content) > 0
         ]
         if results:
             for res_uploader in result_uploaders:
@@ -59,10 +70,10 @@ class DataProcessor(object):
                     res.content.seek(0)
                 res_uploader.upload_results(results)
         else:
-            logging.warning('No results to upload for {}'.format(file_basename))
+            logging.warning("No results to upload for {}".format(file_basename))
 
     @staticmethod
-    def get_buffer_size(data_buffer):
+    def get_buffer_size(data_buffer: IO) -> int:
         """Get byte size of file-like object
 
         :param data_buffer: file-like object
@@ -76,7 +87,7 @@ class DataProcessor(object):
 
 class OSXCollectorDataProcessor(DataProcessor):
 
-    def process_input(self, tardata):
+    def process_input(self, tardata: bytes) -> Optional[BinaryIO]:
         """Extracts JSON file containing the OSXCollector output from
         tar.gz archive. It will look in the archive contents for the
         file with the extension ".json". If no file with this extension
@@ -85,29 +96,35 @@ class OSXCollectorDataProcessor(DataProcessor):
 
         :param tardata: Input TAR archive data
         """
-        self._results = [FileMetaInfo('.tar.gz', ByteBuffer(tardata), 'application/gzip')]
+        self._results = [
+            FileMetaInfo(".tar.gz", ByteBuffer(tardata), "application/gzip"),
+        ]
         # create a file-like object based on the S3 object contents as string
         fileobj = ByteBuffer(tardata)
         tar = None
         try:
-            tar = tarfile.open(mode='r:gz', fileobj=fileobj)
+            tar = tarfile.open(mode="r:gz", fileobj=fileobj)
         except tarfile.ReadError as ter:
-            logging.error('Failed to read the archive: {}'.format(ter))
-            return
+            logging.error("Failed to read the archive: {}".format(ter))
+            return None
 
-        json_tarinfo = [t for t in tar if t.name.endswith('.json')]
+        json_tarinfo = [t for t in tar if t.name.endswith(".json")]
 
         if len(json_tarinfo) != 1:
             raise OSXCollectorOutputExtractionError(
-                'Expected 1 JSON file inside the OSXCollector output archive, '
-                'but found {0} instead.'.format(len(json_tarinfo)),
+                "Expected 1 JSON file inside the OSXCollector output archive, "
+                "but found {} instead.".format(len(json_tarinfo)),
             )
 
         tarinfo = json_tarinfo[0]
-        logging.info('Extracted OSXCollector output JSON file {0}'.format(tarinfo.name))
-        return tar.extractfile(tarinfo)
+        logging.info("Extracted OSXCollector output JSON file {}".format(tarinfo.name))
+        return cast(BinaryIO, tar.extractfile(tarinfo))
 
-    def perform_analysis(self, input_stream, data_feeds=None):
+    def perform_analysis(
+        self,
+        input_stream: BinaryIO,
+        data_feeds: Optional[Dict[str, Generator[Any, None, None]]] = None,
+    ) -> None:
         """Runs Analyze Filter on the OSXCollector output retrieved
         from an S3 bucket.
 
@@ -137,9 +154,13 @@ class OSXCollectorDataProcessor(DataProcessor):
         html_analysis_summary.seek(0)
 
         self._results += [
-            FileMetaInfo('_analysis.json', analysis_output, 'application/json'),
-            FileMetaInfo('_summary.txt', text_analysis_summary, 'text/plain'),
-            FileMetaInfo('_summary.html', html_analysis_summary, 'text/html; charset=UTF-8'),
+            FileMetaInfo("_analysis.json", analysis_output, "application/json"),
+            FileMetaInfo("_summary.txt", text_analysis_summary, "text/plain"),
+            FileMetaInfo(
+                "_summary.html",
+                html_analysis_summary,
+                "text/html; charset=UTF-8",
+            ),
         ]
 
 
@@ -147,4 +168,5 @@ class OSXCollectorOutputExtractionError(Exception):
     """Raised when an unexpected number of JSON files is found in the
     OSXCollector output archive.
     """
+
     pass

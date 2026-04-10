@@ -1,15 +1,18 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import logging
+from typing import Any
+from typing import Dict
+from typing import Generator
+from typing import List
 
+from amira.data_processor import DataProcessor
 from amira.data_processor import OSXCollectorDataProcessor
+from amira.results_uploader import ResultsUploader
 from amira.s3 import S3Handler
+from amira.sqs import CreatedObject
 from amira.sqs import SqsHandler
 
 
-class AMIRA(object):
+class AMIRA:
     """Runs the automated analysis based on the new elements in an S3
     bucket:
         1. Receives the messages from the SQS queue about the new
@@ -34,14 +37,14 @@ class AMIRA(object):
     :type queue_name: string
     """
 
-    def __init__(self, region_name, queue_name):
+    def __init__(self, region_name: str, queue_name: str) -> None:
         self._sqs_handler = SqsHandler(region_name, queue_name)
         self._s3_handler = S3Handler()
-        self._results_uploader = []
-        self._data_feeds = {}
-        self._data_processor = OSXCollectorDataProcessor()
+        self._results_uploader: List[ResultsUploader] = []
+        self._data_feeds: Dict[str, Generator[Any, None, None]] = {}
+        self._data_processor: DataProcessor = OSXCollectorDataProcessor()
 
-    def register_results_uploader(self, results_uploader):
+    def register_results_uploader(self, results_uploader: ResultsUploader) -> None:
         """Registers results uploader.
 
         Results uploader will upload the analysis results and the
@@ -50,7 +53,11 @@ class AMIRA(object):
         """
         self._results_uploader.append(results_uploader)
 
-    def register_data_feed(self, feed_name, generator):
+    def register_data_feed(
+        self,
+        feed_name: str,
+        generator: Generator[Any, None, None],
+    ) -> None:
         """Register data input which to be used by the OsXCollector filters
 
         :param feed_name: Name of the data feed
@@ -58,7 +65,7 @@ class AMIRA(object):
         """
         self._data_feeds[feed_name] = generator
 
-    def register_data_processor(self, processor):
+    def register_data_processor(self, processor: DataProcessor) -> None:
         """Registers DataProcessor object to process and analyze input data from S3.
         If no processor is registered Amira will fall back using the default
         OSXCollector result processor.
@@ -67,7 +74,7 @@ class AMIRA(object):
         """
         self._data_processor = processor
 
-    def run(self):
+    def run(self) -> None:
         """Fetches the OSXCollector output from an S3 bucket based on
         the S3 ObjectCreated event notifications and runs the Analyze
         Filter on the output file.
@@ -77,22 +84,24 @@ class AMIRA(object):
         created_objects = self._sqs_handler.get_created_objects()
 
         for created_object in created_objects:
-            if created_object.key_name.endswith('.tar.gz'):
+            if created_object.key_name.endswith(".tar.gz"):
                 self._process_created_object(created_object)
             else:
                 logging.warning(
-                    'S3 object {0} name should end with ".tar.gz"'
-                    .format(created_object.key_name),
+                    'S3 object {} name should end with ".tar.gz"'.format(
+                        created_object.key_name,
+                    ),
                 )
 
-    def _process_created_object(self, created_object):
+    def _process_created_object(self, created_object: CreatedObject) -> None:
         """Fetches the object from an S3 bucket and runs the analysis.
         Then it sends the results to the target S3 bucket and attaches
         them to the JIRA ticket.
         """
         # fetch forensic data from the S3 bucket
         forensic_output = self._s3_handler.get_contents_as_string(
-            created_object.bucket_name, created_object.key_name,
+            created_object.bucket_name,
+            created_object.key_name,
         )
 
         try:
@@ -105,15 +114,16 @@ class AMIRA(object):
             # SQS queue to prevent the same exception from happening in the
             # future.
             logging.warning(
-                'Unexpected error while running the Analyze Filter for the '
-                'object {}: {}'.format(created_object.key_name, exc),
+                "Unexpected error while running the Analyze Filter for the "
+                "object {}: {}".format(created_object.key_name, exc),
             )
         try:
             self._data_processor.upload_results(
-                created_object.key_name[:-7], self._results_uploader,
+                created_object.key_name[:-7],
+                self._results_uploader,
             )
         except Exception:
             logging.exception(
-                'Unexpected error while uploading results for the '
-                'object: {0}'.format(created_object.key_name),
+                "Unexpected error while uploading results for the "
+                "object: {}".format(created_object.key_name),
             )
